@@ -1,25 +1,30 @@
 import userData from '..fixtures/users/userData.json'
+import LoginPage from '../pages/loginPage'
+
+const loginPage = new LoginPage()
 
 describe('Orange HRM Tests', () => {
 
     const selectorsList = {
-      usernameField: "[name='username']",
-      passwordField: "[name='password']",
-      loginButton: "[type='submit']",
+      
       sectionTitleTopBar: ".oxd-topbar-header-breadcrumb-module",
       dashboardGrid: ".orangehrm-dashboard-grid",
-      WrongCredentialAlert: "[role='alert']",
       myInfoButton: '[href="/web/index.php/pim/viewMyDetails"]',
       firstNameField: "[name='firstName']",
       lastNameField: "[name='lastName']",
       genericField: ".oxd-input--active",
       dateField: "[placeholder='yyyy-dd-mm']",
+      genericComboBox: ".oxd-select-text--arrow",
+      secondItemComboBox: ".oxd-select-dropdown > :nth-child(2)",
+      thirdItemComboBox: ".oxd-select-dropdown > :nth-child(3)",
       dateCloseButton: ".--close",
       submitButton: "[type='submit']",
     }
 
   it.only('User Info Update - Sucess', () => {
-    cy.visit('/auth/login')
+    loginPage.accessLoginPage()
+    loginPage.loginWithUser(userData.userSucess.username, userData.userSucess.password)
+    
     cy.get(selectorsList.usernameField).type(userData.userSucess.username)
     cy.get(selectorsList.passwordField).type(userData.userSucess.password)
     cy.get(selectorsList.loginButton).click()
@@ -36,9 +41,14 @@ describe('Orange HRM Tests', () => {
     cy.get(selectorsList.dateCloseButton).click()
     cy.get(selectorsList.genericField).eq(8).clear().type('ssnNumberTest')
     cy.get(selectorsList.genericField).eq(9).clear().type('sinNumberTest')
-    cy.get(selectorsList.submitButton).eq(0).click()
+    cy.get(selectorsList.submitButton).eq(0).click({ force: true })
     cy.get('body').should('contain', 'Sucessfully updated')
     cy.get('oxd-toast0-close')
+
+    cy.get(selectorsList.genericComboBox).eq(0).click({ force: true })
+    cy.get(selectorsList.secondItemComboBox).click()
+    cy.get(selectorsList.genericComboBox).eq(1).click({ force: true })
+    cy.get(selectorsList.thirdItemComboBox).click()
   })
 
   it('Login - Fail', () => {
